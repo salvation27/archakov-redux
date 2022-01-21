@@ -12,8 +12,9 @@ function reducer(state, action) {
         text: action.text,
         complited: action.complited,
       },
-    ]
-  }if (action.type === "DEL_TASK") {
+    ];
+  }
+  if (action.type === "DEL_TASK") {
     return state.filter((item) => item.id !== action.payload);
   }
   return state;
@@ -35,11 +36,14 @@ function App() {
   };
 
   const delTask = (id) => {
-     dispatch({
-       type: "DEL_TASK",
-       payload: id,
-     });
-  }
+    const res = window.confirm(`Are you sure delete task id${id}?`);
+    if (res === true) {
+      dispatch({
+        type: "DEL_TASK",
+        payload: id,
+      });
+    }
+  };
 
   return (
     <div className="App">
@@ -64,7 +68,7 @@ function App() {
         <List>
           {state.length ? (
             state.map((item) => (
-              <Item key={item.id} item={item}  delTask={delTask} />
+              <Item key={item.id} item={item} delTask={delTask} />
             ))
           ) : (
             <h3 style={{ textAlign: "center" }}>Список задач пустой</h3>
