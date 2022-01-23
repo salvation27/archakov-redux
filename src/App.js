@@ -14,6 +14,9 @@ function reducer(state, action) {
       },
     ];
   }
+  if (action.type === "DEL_TASK") {
+    return state.filter((item) => item.id !== action.payload);
+  }
   return state;
 }
 
@@ -31,6 +34,17 @@ function App() {
     setInput("");
     setCheck(false);
   };
+
+  const delTask = (id) => {
+    const res = window.confirm(`Are you sure delete task id${id}?`);
+    if (res === true) {
+      dispatch({
+        type: "DEL_TASK",
+        payload: id,
+      });
+    }
+  };
+
   return (
     <div className="App">
       <Paper className="wrapper">
@@ -54,12 +68,11 @@ function App() {
         <List>
           {state.length ? (
             state.map((item) => (
-              <Item key={item.id} text={item.text} complited={item.complited} />
+              <Item key={item.id} item={item} delTask={delTask} />
             ))
           ) : (
             <h3 style={{ textAlign: "center" }}>Список задач пустой</h3>
           )}
-          {/* <Item text="Задача №1" /> */}
         </List>
         <Divider />
         <div className="check-buttons">
