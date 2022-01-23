@@ -17,6 +17,47 @@ function reducer(state, action) {
   if (action.type === "DEL_TASK") {
     return state.filter((item) => item.id !== action.payload);
   }
+
+  if (action.type === "TOGGLE_CHECKBOX") {
+    return state.map((item) => {
+      if (item.id === action.payload) {
+        return {
+          ...item,
+          complited: !item.complited,
+        };
+      }
+      return item;
+    });
+  }
+  // удаляем все элементы из стейта
+  if (action.type === "DELETE_ALL_TASKS") {
+    return [];
+  }
+  // переключаем все чекбоксы в true
+  if (action.type === "TOGGLE_ALL_CHECKBOX") {
+    return state.map((obj) => {
+      if (obj.complited === false) {
+        return {
+          ...obj,
+          complited: !obj.complited,
+        };
+      }
+      return obj;
+    });
+  }
+  // переключаем все чекбоксы в false
+  if (action.type === "ALL_CHECKBOX_CLER") {
+    return state.map((obj) => {
+      if (obj.complited === true) {
+        return {
+          ...obj,
+          complited: !obj.complited,
+        };
+      }
+      return obj;
+    });
+  }
+
   return state;
 }
 
@@ -24,6 +65,7 @@ function App() {
   const [state, dispatch] = React.useReducer(reducer, []);
   const [input, setInput] = React.useState("");
   const [check, setCheck] = React.useState(false);
+  const [checkAll, setCheckAll] = React.useState(false);
 
   const addTask = () => {
     dispatch({
@@ -43,6 +85,33 @@ function App() {
         payload: id,
       });
     }
+  };
+
+  const toggleComplited = (id) => {
+    dispatch({
+      type: "TOGGLE_CHECKBOX",
+      payload: id,
+    });
+  };
+
+  const deleteAllTask = () => {
+    dispatch({
+      type: "DELETE_ALL_TASKS",
+    });
+  };
+
+  const toggleComplitedAll = () => {
+    dispatch({
+      type: "TOGGLE_ALL_CHECKBOX",
+    });
+    setCheckAll(true);
+  };
+
+  const toggleCheckboxAllCler = () => {
+    dispatch({
+      type: "ALL_CHECKBOX_CLER",
+    });
+    setCheckAll(false);
   };
 
   return (
@@ -68,7 +137,12 @@ function App() {
         <List>
           {state.length ? (
             state.map((item) => (
-              <Item key={item.id} item={item} delTask={delTask} />
+              <Item
+                key={item.id}
+                item={item}
+                delTask={delTask}
+                toggleComplited={() => toggleComplited(item.id)}
+              />
             ))
           ) : (
             <h3 style={{ textAlign: "center" }}>Список задач пустой</h3>
@@ -76,8 +150,12 @@ function App() {
         </List>
         <Divider />
         <div className="check-buttons">
-          <Button>Отметить всё</Button>
-          <Button>Очистить</Button>
+          {checkAll ? (
+            <Button onClick={toggleCheckboxAllCler}>Снять отметки</Button>
+          ) : (
+            <Button onClick={toggleComplitedAll}>Отметить всё</Button>
+          )}
+          <Button onClick={deleteAllTask}>Очистить</Button>
         </div>
       </Paper>
     </div>
