@@ -79,7 +79,7 @@ function App() {
 
   const delTask = (id) => {
     const res = window.confirm(`Are you sure delete task id${id}?`);
-    if (res === true) {
+    if (res) {
       dispatch({
         type: "DEL_TASK",
         payload: id,
@@ -95,9 +95,11 @@ function App() {
   };
 
   const deleteAllTask = () => {
-    dispatch({
-      type: "DELETE_ALL_TASKS",
-    });
+    if (window.confirm("Удалить все задачи")) {
+      dispatch({
+        type: "DELETE_ALL_TASKS",
+      });
+    }
   };
 
   const toggleComplitedAll = () => {
@@ -114,6 +116,36 @@ function App() {
     setCheckAll(false);
   };
 
+  // реализация переключения табов
+
+  const [tab, setTab] = React.useState("Все");
+  const [tabActive, setTabActive] = React.useState(0);
+  const [filterTask, setFilterTask] = React.useState([]);
+  // для табов
+
+  // рендер кнопок
+  const tabs = [
+    { label: "Все" },
+    { label: "Активные" },
+    { label: "Завершённые" },
+  ];
+
+  React.useEffect(() => {
+    if (tab === "Все") {
+      setFilterTask(state);
+      setTabActive(0);
+    }
+    if (tab === "Активные") {
+      setTabActive(1);
+      setFilterTask(state.filter((item) => item.complited === false));
+    }
+    if (tab === "Завершённые") {
+      setTabActive(2);
+      setFilterTask(state.filter((item) => item.complited === true));
+    }
+  }, [tab, state, filterTask]);
+  // для табов
+
   return (
     <div className="App">
       <Paper className="wrapper">
@@ -128,15 +160,15 @@ function App() {
           handelAddTask={addTask}
         />
         <Divider />
-        <Tabs value={0}>
-          <Tab label="Все" />
-          <Tab label="Активные" />
-          <Tab label="Завершённые" />
+        <Tabs value={tabActive}>
+          {tabs.map((tab, i) => (
+            <Tab onClick={() => setTab(tab.label)} key={i} label={tab.label} />
+          ))}
         </Tabs>
         <Divider />
         <List>
-          {state.length ? (
-            state.map((item) => (
+          {filterTask.length ? (
+            filterTask.map((item) => (
               <Item
                 key={item.id}
                 item={item}
